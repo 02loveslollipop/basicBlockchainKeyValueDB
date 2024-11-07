@@ -3,6 +3,7 @@
 > A basic blockchain-based key-value database with a CLI for interacting, a Python class wrapper for the API, and Docker support for orchestrating a cluster of nodes.
 
 [![Docker Image CI](https://github.com/02loveslollipop/basicBlockchainKeyValueDB/actions/workflows/docker-image.yml/badge.svg)](https://github.com/02loveslollipop/basicBlockchainKeyValueDB/actions/workflows/docker-image.yml)
+![Docker Image Version](https://img.shields.io/docker/v/02loveslollipop/basic-blockchain-db?logo=docker&label=Linux%2FAMD64)
 
 ## Intro
 
