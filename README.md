@@ -79,7 +79,7 @@ Use the Python CLI to interact with the blockchain.
 
 ### API Endpoints
 
-The blockchain node exposes the following API endpoints:
+The blockchain node exposes the following API endpoints for interacting with the blockchain:
 
 - `GET /blockchain`: Get the current blockchain in the node.
 - `POST /append`: Add a key-value pair to the blockchain.
