@@ -22,7 +22,12 @@ def cli():
 def add(data, url, port):
     """Add a key value pair to the blockchain"""
     try:
-        response = requests.post(f'http://{url}:{port}/append', json=data)
+        payload = {
+            "key": data.keys()[0],
+            "value": data.values()[0]
+        }
+        click.echo(data)
+        response = requests.post(f'http://{url}:{port}/append', json=payload)
     except requests.exceptions.ConnectionError:
         click.echo('Could not connect to the server')
         return
