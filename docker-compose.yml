@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"
     volumes:
       - ./shared:/shared
     networks:
@@ -14,6 +14,8 @@ services:
     deploy:
       placement:
         constraints: [node.role == manager]
+      labels:
+        - "expose_port=8080"
 
 networks:
   blockchain-net:
