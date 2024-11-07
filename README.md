@@ -20,10 +20,10 @@ BBD is a simple blockchain-based key-value database that allows users to store k
 
 ### Prerequisites
 
-- Docker
-- Docker Compose
-- Go (for local development)
-- Python 3.11+ (for CLI and API wrapper)
+- Docker (tested with version 27.3.1)
+- Docker Compose (tested with version 1.29.7)
+- Go 1.23.2+ (tested on version 1.23.2)(for local development)
+- Python 3.10.12+ (tested from python 3.10.12 to 3.12.7)(for CLI and API wrapper)
 
 ### 1.a Building and Running the Blockchain Node
 The recommended and tested way to run the blockchain node is compiling the container from the Dockerfile and running the cluster with Docker Compose.
