@@ -5,7 +5,6 @@ import (
 	"errors"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 )
 
 // Abstractions
@@ -71,7 +70,6 @@ func CheckHash(block Block, hashCondition func([]byte) bool, magicNumber int) (b
 	}
 	//Check if the hash of the block is valid
 	payload := strconv.Itoa(block.Index) + block.Timestamp.Format("2006-01-02 15:04:05") + dataAsString + block.PreviosHash + strconv.Itoa(magicNumber)
-	fmt.Println("Checking hash for ", payload)
 	h := sha256.New()
 	h.Write([]byte(payload))
 	hashed := h.Sum(nil)
@@ -95,7 +93,6 @@ func CalculateHash(block Block, hashCondition func([]byte) bool) (string, int, e
 		h.Write([]byte(payload)) //Write the payload to the hash
 		hashed := h.Sum(nil)
 		if hashCondition(hashed) {
-			fmt.Println("Got hash with payload ", payload)
 			return hex.EncodeToString(hashed), magicNumber, nil
 		} else 
 		{
@@ -107,28 +104,20 @@ func CalculateHash(block Block, hashCondition func([]byte) bool) (string, int, e
 func IsBlockValid(newBlock, previousBlock Block, hashCondition func([]byte) bool, magicNumber int) bool {
 	//Check if the new index is the spected
 	if previousBlock.Index+1 != newBlock.Index {
-		fmt.Println("Index is not the expected")
 		return false
 	}
-	fmt.Println("Index is the expected")
 	//Check if the previous hash is the same as the hash of the previous block
 	if previousBlock.Hash != newBlock.PreviosHash {
-		fmt.Println("Previous hash is not the expected")
 		return false
 	}
-	fmt.Println("Previous hash is the expected")
 	//Check if the hash of the new block is the same as the calculated hash
 	ok, result := CheckHash(newBlock, hashCondition, magicNumber)
 	if !ok {
-		fmt.Println("Hash is not the expected, got ", result, " expected ", newBlock.Hash)
 		return false
 	}
-	fmt.Println("Hash is the expected")
 
 	if result != newBlock.Hash {
-		fmt.Println("Hash is not the expected")
 		return false
 	}
-	fmt.Println("Hash is the expected")
 	return true
 }
