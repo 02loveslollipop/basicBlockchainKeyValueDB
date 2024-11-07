@@ -11,6 +11,7 @@ import (
 )
 
 func loadNodes(filename string) error {
+	selfAddress := "" //Create a variable to hold the self address
 	addrss, err := net.InterfaceAddrs() //get all network interfaces
 	if err != nil { //Check if there is an error getting the network interfaces
 		return err //If there is an error return it
@@ -23,6 +24,10 @@ func loadNodes(filename string) error {
 				break
 			}
 		}
+	}
+
+	if selfAddress == "" { //Check if the self address is empty
+		return nil //If it is empty return nil
 	}
 	
 	file, err := os.Open(filename) //Open the file
