@@ -58,7 +58,7 @@ class blockchainDB:
         if response.status_code == 500:
             raise InternalServerError(f'Internal server error: {response.text}')
     
-    def fetch(self) -> dict:
+    def raw_fetch(self) -> dict:
         try:
             response = requests.get(f'http://{self.host}:{self.port}/chain') # Send a GET request to the server
         except requests.exceptions.ConnectionError:
@@ -67,3 +67,23 @@ class blockchainDB:
             return response.json()
         if response.status_code == 500:
             raise InternalServerError(f'Internal server error: {response.text}')
+    
+    def fetch(self) -> list:
+        try:
+            response = requests.get(f'http://{self.host}:{self.port}/chain') # Send a GET request to the server
+        except requests.exceptions.ConnectionError:
+            raise HostNotAvailableException('Could not connect to the server')
+        if response.status_code == 500:
+            raise InternalServerError(f'Internal server error: {response.text}')
+        if response.status_code != 200:
+            raise InternalServerError(f'Internal server error: {response.text}')
+        
+        chain = response.json() # Get the response as a JSON object
+        result = [] # Create an empty list to store the chain
+        for block in chain:
+            data = block['data']
+            if data['key'] == 'Genesis' and data['value'] == 'Genesis block':
+                continue
+            else:
+                result.append({data['key']: data['value']})
+        return result

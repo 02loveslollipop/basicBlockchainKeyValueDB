@@ -19,14 +19,16 @@ def cli():
 @click.argument('data', callback=parse_cli_payload)
 @click.option('--url', help='Server URL', default='localhost')
 @click.option('--port', help='Server port', default='8080')
-def add(data, url, port):
+def add(data: dict, url, port):
     """Add a key value pair to the blockchain"""
     try:
+        key = list(data.keys())[0]
+        value = list(data.values())[0]
         payload = {
-            "key": data.keys()[0],
-            "value": data.values()[0]
+            "key": key,
+            "value": value
         }
-        click.echo(data)
+        click.echo(payload)
         response = requests.post(f'http://{url}:{port}/append', json=payload)
     except requests.exceptions.ConnectionError:
         click.echo('Could not connect to the server')
@@ -47,8 +49,8 @@ def add(data, url, port):
 @cli.command()
 @click.option('--url', help='Server URL', default='localhost')
 @click.option('--port', help='Server port', default='8080')
-def fetch(url, port):
-    """Fetch the blockchain"""
+def rawfetch(url, port):
+    """Fetch the blockchain and return it as is"""
     try:
         response = requests.get(f'http://{url}:{port}/chain')
     except requests.exceptions.ConnectionError:
@@ -60,6 +62,33 @@ def fetch(url, port):
     if response.status_code == 500:
         click.echo(f'Internal server error: {response.text}')
         return
+
+@cli.command()
+@click.option('--url', help='Server URL', default='localhost')
+@click.option('--port', help='Server port', default='8080')
+def fetch(url, port):
+    """Fetch the blockchain and return it as a list of dictionaries, excluding the Genesis block"""
+    try:
+        response = requests.get(f'http://{url}:{port}/chain')
+    except requests.exceptions.ConnectionError:
+        click.echo('Could not connect to the server')
+        return
+    if response.status_code == 500:
+        click.echo(f'Internal server error: {response.text}')
+        return
+    if response.status_code != 200:
+        click.echo('An error occurred')
+        return
+    
+    chain = response.json()
+    result = []
+    for block in chain:
+        data = block['data']
+        if data['key'] == 'Genesis' and data['value'] == 'Genesis block':
+            continue
+        else:
+            result.append({data['key']: data['value']})
+    click.echo(result)
 
 if __name__ == '__main__':
     cli()
