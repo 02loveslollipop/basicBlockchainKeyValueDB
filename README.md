@@ -2,6 +2,8 @@
 
 > A basic blockchain-based key-value database with a CLI for interacting, a Python class wrapper for the API, and Docker support for orchestrating a cluster of nodes.
 
+[![Docker Image CI](https://github.com/02loveslollipop/basicBlockchainKeyValueDB/actions/workflows/docker-image.yml/badge.svg)](https://github.com/02loveslollipop/basicBlockchainKeyValueDB/actions/workflows/docker-image.yml)
+
 ## Intro
 
 BBD is a simple blockchain-based key-value database that allows users to store key-value pairs in a blockchain. The project includes a Go application for the blockchain node, a Python CLI for interacting with the blockchain, and Docker support for orchestrating a cluster of nodes. One of the blockchain nodes is exposed to the host machine to interact with the user, but all of the nodes are capable of adding, storing and retrieving key-value pairs if needed.
