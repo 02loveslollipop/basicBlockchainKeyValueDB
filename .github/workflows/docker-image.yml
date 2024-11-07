@@ -21,4 +21,4 @@ jobs:
     - name: Tag the Docker image
       run: docker tag basic-blockchain-db basic-blockchain-db
     - name: Push image to Docker Hub
-      run: docker push basic-blockchain-db
+      run: docker push 02loveslollipop/basic-blockchain-db
