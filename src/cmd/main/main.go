@@ -8,10 +8,10 @@ import (
 	"time"
 	"basicBlockchainKeyValueDB/pkg/blockchain"
 	"net"
+	"fmt"
 )
 
 func loadNodes(filename string) error {
-	selfAddress := "" //Create a variable to hold the self address
 	addrss, err := net.InterfaceAddrs() //get all network interfaces
 	if err != nil { //Check if there is an error getting the network interfaces
 		return err //If there is an error return it
@@ -226,6 +226,20 @@ func fetchChain(c *gin.Context) {
 	c.JSON(http.StatusOK, blockchainArray) //Return the blockchain
 }
 
+// Info endpoints
+
+func ping(c *gin.Context) {
+	/*
+	Ping
+	Return pong
+	---
+	responses:
+		200:
+			description: Pong
+	*/
+	c.String(http.StatusOK, fmt.Sprintf("Pong from %s", selfAddress)) //Return a 200 status with the message "Pong from" and the self address
+}
+
 //Router
 func setupRouter() *gin.Engine {
 	router := gin.Default() //Create a new router
@@ -235,11 +249,14 @@ func setupRouter() *gin.Engine {
 	//Peer to User communication endpoints
 	router.POST("/append", appendToChain) //Append a block for Peer to User communication
 	router.GET("/chain", fetchChain) //Fetch the blockchain for Peer to User communication
+	//Info endpoints
+	router.GET("/", ping) //Ping the node
 	return router //Return the router
 }
 
 var blockchainArray []blockchain.Block
 var peers []blockchain.Peer
+var selfAddress string
 
 func main() {
 	path := "nodes.txt" //Set the default path
