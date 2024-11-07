@@ -35,6 +35,9 @@ func GenesisBlock() Block {
 func GenerateBlock(oldBlock Block, data string, hashCondition func([]byte) bool) (Block,int, error) {
 	//Generate the key value pair
 	newData, err := FromString(data)
+	if err != nil {
+		return Block{}, 0, err
+	}
 	var newBlock Block
 	t := time.Now()
 	newBlock.Index = oldBlock.Index + 1
@@ -60,12 +63,27 @@ func HashCondition(hash []byte) bool {
 	return true
 }
 
+func CheckHash(block Block, hashCondition func([]byte) bool, magicNumber int) (bool, string) {
+	dataAsString, ok := ToString(block.Data)
+	if !ok {
+		return false, ""
+	}
+	//Check if the hash of the block is valid
+	payload := strconv.Itoa(block.Index) + block.Timestamp.String() + dataAsString + block.PreviosHash + strconv.Itoa(magicNumber)
+	h := sha256.New()
+	h.Write([]byte(payload))
+	hashed := h.Sum(nil)
+	if hashCondition(hashed) {
+		return true, hex.EncodeToString(hashed)
+	}
+	return false, hex.EncodeToString(hashed)
+}
+
 func CalculateHash(block Block, hashCondition func([]byte) bool) (string, int, error) {
-	//Implement this function
 	dataAsString, ok := ToString(block.Data)
 	if !ok {
 		//return an error message
-		return "", errors.New("data cannot be parsed as string")
+		return "",0, errors.New("data cannot be parsed as string")
 	}
 	magicNumber := 0 //This is the magic number that will be used to mine the block
 	for {
@@ -82,7 +100,7 @@ func CalculateHash(block Block, hashCondition func([]byte) bool) (string, int, e
 	}
 }
 
-func IsBlockValid(newBlock, previousBlock Block, hashCondition func([]byte) bool) bool {
+func IsBlockValid(newBlock, previousBlock Block, hashCondition func([]byte) bool, magicNumber int) bool {
 	//Check if the new index is the spected
 	if previousBlock.Index+1 != newBlock.Index {
 		return false
@@ -92,8 +110,8 @@ func IsBlockValid(newBlock, previousBlock Block, hashCondition func([]byte) bool
 		return false
 	}
 	//Check if the hash of the new block is the same as the calculated hash
-	result, err := CalculateHash(newBlock, hashCondition)
-	if err != nil {
+	ok, result := CheckHash(newBlock, hashCondition, magicNumber)
+	if !ok {
 		return false
 	}
 

@@ -122,25 +122,27 @@ func addBlock(c *gin.Context) {
 		401:
 			description: Invalid hash
 	*/
-	var newBlock blockchain.Block //Create a new block
-	err := c.BindJSON(&newBlock) //Bind the JSON to the block
+	var newBlock blockchain.BroadcastBlockRequest
+	err := c.BindJSON(&newBlock) //Bind the JSON to the new block
 	if err != nil { //Check if there is an error binding the JSON
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid block: Does not match Schema"}) //If there is an error return a 400 status with the error
 		return
 	}
+	incomingBlock := newBlock.Block //Get the block from the new block
+	incomingMagicNumber := newBlock.MagicNumber //Get the magic number from the new block
 	if len(blockchainArray) == 0 { //Check if the blockchain is empty
-		if newBlock.Index != 0 { //Check if the index of the new block is 0
+		if incomingBlock.Index != 0 { //Check if the index of the new block is 0
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid genesis block"}) //If it is not return a 400 status with the error
 			return
 		}
 	} else {
 		previousBlock := blockchainArray[len(blockchainArray)-1] //Get the last block of the blockchain
-		if !blockchain.IsBlockValid(newBlock, previousBlock, blockchain.HashCondition) { //Check if the new block is valid
+		if !blockchain.IsBlockValid(incomingBlock, previousBlock, blockchain.HashCondition, incomingMagicNumber) { //Check if the new block is valid
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid hash"}) //If it is not return a 401 status with the error
 			return
 		}
 	}
-	blockchainArray = append(blockchainArray, newBlock) //Append the new block to the blockchain
+	blockchainArray = append(blockchainArray, incomingBlock) //Append the new block to the blockchain
 	c.JSON(http.StatusCreated, newBlock) //Return a 201 status with the new block
 }
 
@@ -183,14 +185,14 @@ func appendToChain(c *gin.Context) {
 		Data:        newData, //Set the data of the new block
 		PreviosHash: previousBlock.Hash, //Set the previous hash of the new block
 	}
-	result, err := blockchain.CalculateHash(newBlock, blockchain.HashCondition) //Calculate the hash of the new block
+	result, magicNumber, err := blockchain.CalculateHash(newBlock, blockchain.HashCondition) //Calculate the hash of the new block
 	if err != nil { //Check if there is an error calculating the hash
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error calculating hash"}) //If there is an error return a 500 status with the error
 		return
 	}
 	newBlock.Hash = result //Set the hash of the new block
 	//Broadcast the new block to the peers
-	err = blockchain.BroadcastBlock(newBlock, peers) //Broadcast the new block to the peers
+	err = blockchain.BroadcastBlock(newBlock, magicNumber, peers) //Broadcast the new block to the peers
 	if err != nil { //Check if there is an error broadcasting the block
 		if err.Error() == "No consensus" { //Check if the error is "No consensus"
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "No consensus"}) //If it is return a 401 status with the error
