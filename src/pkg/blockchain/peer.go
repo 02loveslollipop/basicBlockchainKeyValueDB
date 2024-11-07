@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"errors"
+    "fmt"
 )
 
 type BroadcastBlockRequest struct {
@@ -27,7 +28,7 @@ func BroadcastBlock(newBlock Block,magicNumber int, peers []Peer) error {
     }
 
     for _, peer := range peers {
-        
+        fmt.Println("Broadcasting to", peer.Address)
         resp, err := http.Post("http://"+peer.Address+":8080/block", "application/json", bytes.NewBuffer(blockData))
         if err != nil {
             return err
@@ -35,7 +36,9 @@ func BroadcastBlock(newBlock Block,magicNumber int, peers []Peer) error {
 		//check if the response status code is not 201
 		if resp.StatusCode != http.StatusCreated {
 			return errors.New("no consensus")
-		}
+		}else{
+            fmt.Println("Broadcasted to ", peer.Address, " received acknoledgement")
+        }
 
     }
 
