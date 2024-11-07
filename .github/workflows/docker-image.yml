@@ -19,6 +19,6 @@ jobs:
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
     - name: Tag the Docker image
-      run: docker tag basic-blockchain-db:$(date +%s) basic-blockchain-db
+      run: docker tag basic-blockchain-db:lastest basic-blockchain-db
     - name: Push image to Docker Hub
       run: docker push basic-blockchain-db
