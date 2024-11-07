@@ -1,8 +1,7 @@
-FROM golang:1.23.3-bookworm
+FROM golang:1.23.2-bookworm
 WORKDIR /src
-COPY go.mod go.sum ./
+COPY /src /src/
 RUN go mod download
-COPY . .
-RUN go build -o main .
+RUN go build -o main cmd/main/main.go
 EXPOSE 8080
-CMD ["./main"]
+CMD ["./main", "/shared/host"]
