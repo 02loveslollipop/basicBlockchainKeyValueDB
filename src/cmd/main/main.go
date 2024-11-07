@@ -170,7 +170,8 @@ func appendToChain(c *gin.Context) {
 			description: Error calculating hash
 	*/
 	var data struct {
-		Data string `json:"data"` //Create a struct to hold the data
+		Key string `json:"key"` //Key of the data
+		Value string `json:"value"` //Value of the data
 	}
 	err := c.BindJSON(&data) //Bind the JSON to the data struct
 	if err != nil { //Check if there is an error binding the JSON
@@ -178,7 +179,7 @@ func appendToChain(c *gin.Context) {
 		return
 	}
 	previousBlock := blockchainArray[len(blockchainArray)-1] //Get the last block of the blockchain
-	newData := blockchain.KeyValue{Key: "Data", Value: data.Data} //Create a new key value pair
+	newData := blockchain.KeyValue{Key: data.Key, Value: data.Value} //Create a new key value pair
 	newBlock := blockchain.Block{ //Create a new block
 		Index:       previousBlock.Index + 1, //Set the index of the new block
 		Timestamp:   time.Now(), //Set the timestamp of the new block
