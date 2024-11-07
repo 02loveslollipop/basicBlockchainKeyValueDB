@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag basic-blockchain-db:$(date +%s)
+      run: docker build . --file Dockerfile --tag basic-blockchain-db
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
     - name: Tag the Docker image
