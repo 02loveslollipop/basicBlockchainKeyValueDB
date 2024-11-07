@@ -8,6 +8,7 @@ import (
 	"time"
 	"basicBlockchainKeyValueDB/pkg/blockchain"
 	"fmt"
+	"strconv"
 )
 
 func loadNodes(filename string) error {
@@ -224,6 +225,7 @@ func main() {
 		return
 	}
 	path := os.Args[1] //Get the argument
+
 	err := loadNodes(path) //Load the nodes
 	if err != nil { //Check if there is an error loading the nodes
 		panic(err) //If there is an error panic
@@ -231,6 +233,3 @@ func main() {
 	router := setupRouter() //Setup the router
 	router.Run(":8080") //Run the router on port 8080
 }
-
-
-
