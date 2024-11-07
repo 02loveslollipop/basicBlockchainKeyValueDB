@@ -1,21 +1,26 @@
-version: '2.4'
+version: '2.29.7'
 
 services:
   node:
     build:
       context: .
       dockerfile: Dockerfile
-    # ports:
-    #   - "8080:8080"
+    ports:
+      - "8080:8080"
     volumes:
       - ./shared:/shared
     networks:
       - blockchain-net
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-      labels:
-        - "expose_port=8080"
+  
+  internal-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./shared:/shared
+    networks:
+      - blockchain-net
+
 
 networks:
   blockchain-net:
