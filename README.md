@@ -31,7 +31,7 @@ The recommended and tested way to run the blockchain node is compiling the conta
 1. **Build the Docker image:**
 
     ```sh
-    docker-compose build
+    docker compose build --no-cache
     ```
 
 2. **Run the blockchain cluster:**
