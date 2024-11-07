@@ -32,7 +32,7 @@ func GenesisBlock() Block {
 	return block
 }
 
-func GenerateBlock(oldBlock Block, data string, hashCondition func([]byte) bool) (Block, error) {
+func GenerateBlock(oldBlock Block, data string, hashCondition func([]byte) bool) (Block,int, error) {
 	//Generate the key value pair
 	newData, err := FromString(data)
 	var newBlock Block
@@ -41,12 +41,12 @@ func GenerateBlock(oldBlock Block, data string, hashCondition func([]byte) bool)
 	newBlock.Timestamp = t
 	newBlock.Data = newData
 	newBlock.PreviosHash = oldBlock.Hash
-	result, err := CalculateHash(newBlock, hashCondition)
+	result, magicNumber, err := CalculateHash(newBlock, hashCondition)
 	if err != nil {
-		return newBlock, err
+		return newBlock, magicNumber, err
 	}
 	newBlock.Hash = result
-	return newBlock, nil
+	return newBlock, magicNumber, nil
 }
 
 func HashCondition(hash []byte) bool {
@@ -60,7 +60,7 @@ func HashCondition(hash []byte) bool {
 	return true
 }
 
-func CalculateHash(block Block, hashCondition func([]byte) bool) (string, error) {
+func CalculateHash(block Block, hashCondition func([]byte) bool) (string, int, error) {
 	//Implement this function
 	dataAsString, ok := ToString(block.Data)
 	if !ok {
@@ -74,7 +74,7 @@ func CalculateHash(block Block, hashCondition func([]byte) bool) (string, error)
 		h.Write([]byte(payload)) //Write the payload to the hash
 		hashed := h.Sum(nil)
 		if hashCondition(hashed) {
-			return hex.EncodeToString(hashed), nil
+			return hex.EncodeToString(hashed), magicNumber, nil
 		} else 
 		{
 			magicNumber++

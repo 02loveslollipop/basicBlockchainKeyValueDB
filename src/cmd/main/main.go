@@ -39,12 +39,12 @@ func loadNodes(filename string) error {
 	scanner := bufio.NewScanner(file) //Create a scanner for the file
 	for scanner.Scan() { //Iterate over the lines of the file
 		data := scanner.Text() //Get the line
-		if data == selfAddress { //Check if the line is the self address
-			continue //If it is continue to the iteration
+		if data != selfAddress { //Check if the line is not the self address
+			peers = append(peers, blockchain.Peer{Address: scanner.Text()}) //Append the address to the peers slice
 		}
-		peers = append(peers, blockchain.Peer{Address: scanner.Text()}) //Append the address to the peers slice
+		
 	}
-
+	fmt.Println(peers)
 	if err := scanner.Err(); err != nil { //Check if there is an error reading the file
 		return err //If there is an error return it
 	}
@@ -196,7 +196,7 @@ func appendToChain(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "No consensus"}) //If it is return a 401 status with the error
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error broadcasting block"}) //If it is not return a 500 status with the error
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}) //If it is not return a 500 status with the error
 		return
 	}
 	blockchainArray = append(blockchainArray, newBlock) //Append the new block to the blockchain
@@ -273,6 +273,7 @@ func main() {
 	if len(peers) == 0 { //Check if there are no peers
 		blockchainArray = append(blockchainArray, blockchain.GenesisBlock()) //Create a new blockchain
 	} else {
+		blockchainArray = append(blockchainArray, blockchain.GenesisBlock()) //Create a new blockchain
 		//Ask the peers for the blockchain
 		for _, peer := range peers { //Iterate over the peers
 			resp, err := http.Get("http://" + peer.Address + "/blockchain") //Get the blockchain from the peer

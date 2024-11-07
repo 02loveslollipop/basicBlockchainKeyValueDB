@@ -18,7 +18,7 @@ func BroadcastBlock(newBlock Block, peers []Peer) error {
     }
 
     for _, peer := range peers {
-        resp, err := http.Post("http://"+peer.Address+"/block", "application/json", bytes.NewBuffer(blockData))
+        resp, err := http.Post("http://"+peer.Address+":8080/block", "application/json", bytes.NewBuffer(blockData)) //TODO: Change the port to a variable
         if err != nil {
             return err
         }
