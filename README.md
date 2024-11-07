@@ -58,7 +58,7 @@ It is also possible to retrieve the container from Docker Hub and run the cluste
 2. **Run the blockchain cluster:**
 
     ```sh
-    docker-compose up --scale node=<number_of_nodes>
+    docker compose up --scale node=<number_of_nodes>
     ```
 
 ### 2. Interacting with the Blockchain
