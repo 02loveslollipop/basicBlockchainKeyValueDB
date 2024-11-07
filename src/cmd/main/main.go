@@ -9,6 +9,7 @@ import (
 	"basicBlockchainKeyValueDB/pkg/blockchain"
 	"net"
 	"fmt"
+	"encoding/json"
 )
 
 func loadNodes(filename string) error {
@@ -175,10 +176,11 @@ func appendToChain(c *gin.Context) {
 		return
 	}
 	previousBlock := blockchainArray[len(blockchainArray)-1] //Get the last block of the blockchain
+	newData := blockchain.KeyValue{Key: "Data", Value: data.Data} //Create a new key value pair
 	newBlock := blockchain.Block{ //Create a new block
 		Index:       previousBlock.Index + 1, //Set the index of the new block
 		Timestamp:   time.Now(), //Set the timestamp of the new block
-		Data:        data.Data, //Set the data of the new block
+		Data:        newData, //Set the data of the new block
 		PreviosHash: previousBlock.Hash, //Set the previous hash of the new block
 	}
 	result, err := blockchain.CalculateHash(newBlock, blockchain.HashCondition) //Calculate the hash of the new block
@@ -267,6 +269,27 @@ func main() {
 	if err != nil { //Check if there is an error loading the nodes
 		panic(err) //If there is an error panic
 	}
+	//get the current state of the blockchain, asking the peers, if there aren't any peers, create a new blockchain
+	if len(peers) == 0 { //Check if there are no peers
+		blockchainArray = append(blockchainArray, blockchain.GenesisBlock()) //Create a new blockchain
+	} else {
+		//Ask the peers for the blockchain
+		for _, peer := range peers { //Iterate over the peers
+			resp, err := http.Get("http://" + peer.Address + "/blockchain") //Get the blockchain from the peer
+			if err != nil { //Check if there is an error getting the blockchain
+				continue //If there is an error continue to the next iteration
+			}
+			if resp.StatusCode == http.StatusOK { //Check if the status code is 200
+				defer resp.Body.Close() //Close the response body
+				err := json.NewDecoder(resp.Body).Decode(&blockchainArray) //Decode the JSON to the blockchain
+				if err != nil { //Check if there is an error decoding the JSON
+					continue //If there is an error continue to the next iteration
+				}
+				break //If there is no error break the loop
+			}
+		}
+	}
+	//Start the router
 	router := setupRouter() //Setup the router
 	router.Run(":8080") //Run the router on port 8080
 }

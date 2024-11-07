@@ -13,19 +13,33 @@ import (
 type Block struct {
 	Index	 	int `json:"index"` //Index of the block in the blockchain
 	Timestamp 	time.Time `json:"timestamp"` //Date of the block
-	Data	 	interface{} `json:"data"` //Data of the block
+	Data	 	KeyValue `json:"data"` //Data of the block
 	PreviosHash	string `json:"previousHash"` //Hash of the previous block
 	Hash		string `json:"hash"` //Hash of the block
 }
 
 // Block functions
 
-func GenerateBlock(oldBlock Block, data interface{}, hashCondition func([]byte) bool) (Block, error) {
+func GenesisBlock() Block {
+	//Create the genesis block
+	block := Block{
+		Index: 0,
+		Timestamp: time.Now(),
+		Data: KeyValue{Key: "Genesis", Value: "Genesis block"},
+		PreviosHash: "",
+		Hash: "d754ed9f64ac293b10268157f283ee23256fb32a4f8dedb25c8446ca5bcb0bb3", //Hash of the genesis block (golang)
+	}
+	return block
+}
+
+func GenerateBlock(oldBlock Block, data string, hashCondition func([]byte) bool) (Block, error) {
+	//Generate the key value pair
+	newData, err := FromString(data)
 	var newBlock Block
 	t := time.Now()
 	newBlock.Index = oldBlock.Index + 1
 	newBlock.Timestamp = t
-	newBlock.Data = data
+	newBlock.Data = newData
 	newBlock.PreviosHash = oldBlock.Hash
 	result, err := CalculateHash(newBlock, hashCondition)
 	if err != nil {
@@ -48,7 +62,7 @@ func HashCondition(hash []byte) bool {
 
 func CalculateHash(block Block, hashCondition func([]byte) bool) (string, error) {
 	//Implement this function
-	dataAsString, ok := block.Data.(string)
+	dataAsString, ok := ToString(block.Data)
 	if !ok {
 		//return an error message
 		return "", errors.New("data cannot be parsed as string")
