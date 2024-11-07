@@ -7,11 +7,24 @@ import (
 	"os"
 	"time"
 	"basicBlockchainKeyValueDB/pkg/blockchain"
-	"fmt"
-	"strconv"
+	"net"
 )
 
 func loadNodes(filename string) error {
+	addrss, err := net.InterfaceAddrs() //get all network interfaces
+	if err != nil { //Check if there is an error getting the network interfaces
+		return err //If there is an error return it
+	}
+
+	for _, address := range addrss { //Iterate over the network interfaces
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() { //Check if the address is not the loopback address
+			if ipnet.IP.To4() != nil { //Check if the address is an IPv4 address
+				selfAddress = ipnet.IP.String() //Set the self address to the address
+				break
+			}
+		}
+	}
+	
 	file, err := os.Open(filename) //Open the file
 	if err != nil { //Check if there is an error opening the file
 		return err //If there is an error return it
@@ -19,6 +32,10 @@ func loadNodes(filename string) error {
 	defer file.Close() //Close the file when the function ends
 	scanner := bufio.NewScanner(file) //Create a scanner for the file
 	for scanner.Scan() { //Iterate over the lines of the file
+		data := scanner.Text() //Get the line
+		if data == selfAddress { //Check if the line is the self address
+			continue //If it is continue to the iteration
+		}
 		peers = append(peers, blockchain.Peer{Address: scanner.Text()}) //Append the address to the peers slice
 	}
 
@@ -220,12 +237,10 @@ var blockchainArray []blockchain.Block
 var peers []blockchain.Peer
 
 func main() {
-	if len(os.Args) < 2 { //Check if there is no argument
-		fmt.Println("Usage: go run main.go <node>") //If there is no argument print the usage
-		return
+	path := "nodes.txt" //Set the default path
+	if len(os.Args) == 2 { //Check if there is an argument
+		path = os.Args[1] //Get the path from the arguments
 	}
-	path := os.Args[1] //Get the argument
-
 	err := loadNodes(path) //Load the nodes
 	if err != nil { //Check if there is an error loading the nodes
 		panic(err) //If there is an error panic
