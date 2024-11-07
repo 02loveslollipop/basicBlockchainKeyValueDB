@@ -70,7 +70,7 @@ func CheckHash(block Block, hashCondition func([]byte) bool, magicNumber int) (b
 		return false, ""
 	}
 	//Check if the hash of the block is valid
-	payload := strconv.Itoa(block.Index) + block.Timestamp.String() + dataAsString + block.PreviosHash + strconv.Itoa(magicNumber)
+	payload := strconv.Itoa(block.Index) + block.Timestamp.Format("2006-01-02 15:04:05") + dataAsString + block.PreviosHash + strconv.Itoa(magicNumber)
 	fmt.Println("Checking hash for ", payload)
 	h := sha256.New()
 	h.Write([]byte(payload))
@@ -90,7 +90,7 @@ func CalculateHash(block Block, hashCondition func([]byte) bool) (string, int, e
 	}
 	magicNumber := 0 //This is the magic number that will be used to mine the block
 	for {
-		payload = strconv.Itoa(block.Index) + block.Timestamp.String() + dataAsString + block.PreviosHash + strconv.Itoa(magicNumber) //Concatenate the data to be hashed
+		payload = strconv.Itoa(block.Index) + block.Timestamp.Format("2006-01-02 15:04:05") + dataAsString + block.PreviosHash + strconv.Itoa(magicNumber) //Concatenate the data to be hashed
 		h:= sha256.New() //Create a new sha256 hash
 		h.Write([]byte(payload)) //Write the payload to the hash
 		hashed := h.Sum(nil)
