@@ -3,7 +3,7 @@
 > A basic blockchain-based key-value database with a CLI for interacting, a Python class wrapper for the API, and Docker support for orchestrating a cluster of nodes.
 
 [![Docker Image CI](https://github.com/02loveslollipop/basicBlockchainKeyValueDB/actions/workflows/docker-image.yml/badge.svg)](https://github.com/02loveslollipop/basicBlockchainKeyValueDB/actions/workflows/docker-image.yml)
-![Docker Image Version](https://img.shields.io/docker/v/02loveslollipop/basic-blockchain-db?logo=docker&label=Linux%2FAMD64)
+[![Docker Image Version](https://img.shields.io/docker/v/02loveslollipop/basic-blockchain-db?logo=docker&label=Linux%2FAMD64)](https://hub.docker.com/repository/docker/02loveslollipop/basic-blockchain-db/)
 
 ## Intro
 
@@ -55,7 +55,7 @@ It is also possible to retrieve the container from Docker Hub and run the cluste
 1. **Pull the Docker image:**
 
     ```sh
-    docker pull 02loveslollipop/bbd:latest
+    docker pull 02loveslollipop/basic-blockchain-db:latest
     ```
 
 2. **Run the blockchain cluster:**
@@ -78,6 +78,18 @@ Use the Python CLI to interact with the blockchain.
 
     ```sh
     python cli/cli.py add --data "key":"value" --url <server_url> --port <server_port>
+    ```
+
+3. **Get the current key-value pairs in the blockchain:**
+
+    ```sh
+    python cli/cli.py fetch --url <server_url> --port <server_port>
+    ```
+
+4. **Get the current state of the blockchain:**
+
+    ```sh
+    python cli/cli.py rawfetch --url <server_url> --port <server_port>
     ```
 
 ### API Endpoints
